@@ -1,20 +1,32 @@
 import { Button } from 'heroui-native/button';
 import { router } from 'expo-router';
-import { ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { useAuth } from '@/hooks/use-auth';
 
 export default function TabOneScreen() {
   const { lastSyncError, refreshSession, session, signOut } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const expiresLabel = session?.session.expiresAt
     ? new Date(session.session.expiresAt).toLocaleString()
     : '-';
 
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    try {
+      await refreshSession({ silent: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   return (
     <ScrollView
-      className="flex-1 bg-canvas"
-      contentContainerClassName="gap-[18px] px-5 py-5">
+      className="flex-1"
+      contentContainerClassName="gap-[18px] px-5 py-5"
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => void handleRefresh()} />}>
       <View className="rounded-[28px] bg-brand-cool p-[22px]">
         <Text className="text-[13px] font-bold uppercase tracking-[1.2px] text-info">
           Authenticated

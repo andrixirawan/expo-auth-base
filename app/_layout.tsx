@@ -5,13 +5,15 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import { HeroUINativeProvider } from 'heroui-native/provider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
+import { Uniwind } from 'uniwind';
 import '../global.css';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import { useAuth } from '@/hooks/use-auth';
+import { useThemeMode } from '@/hooks/use-theme-mode';
 import { AuthProvider } from '@/providers/auth-provider';
 
 export {
@@ -46,6 +48,7 @@ function RootLayoutContent({
   fontsLoaded: boolean;
   fontError: Error | null;
 }) {
+  const { hasHydrated: isThemeHydrated } = useThemeMode();
   const { isHydrated } = useAuth();
 
   useEffect(() => {
@@ -55,12 +58,12 @@ function RootLayoutContent({
   }, [fontError]);
 
   useEffect(() => {
-    if (fontsLoaded && isHydrated) {
+    if (fontsLoaded && isHydrated && isThemeHydrated) {
       void SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, isHydrated]);
+  }, [fontsLoaded, isHydrated, isThemeHydrated]);
 
-  if (!fontsLoaded || !isHydrated) {
+  if (!fontsLoaded || !isHydrated || !isThemeHydrated) {
     return null;
   }
 
@@ -68,19 +71,25 @@ function RootLayoutContent({
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { themeMode } = useThemeMode();
+
+  useEffect(() => {
+    Uniwind.setTheme(themeMode);
+  }, [themeMode]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <HeroUINativeProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          </Stack>
-        </ThemeProvider>
+        <View className="flex-1 bg-background">
+          <ThemeProvider value={themeMode === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            </Stack>
+          </ThemeProvider>
+        </View>
       </HeroUINativeProvider>
     </GestureHandlerRootView>
   );

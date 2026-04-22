@@ -1,9 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Platform, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 export default function ModalScreen() {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  function handleRefresh() {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 400);
+  }
+
   return (
-    <View className="flex-1 items-center justify-center bg-brand-cool px-6">
+    <ScrollView
+      className="flex-1"
+      contentContainerClassName="min-h-full items-center justify-center px-6"
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}>
       <View className="w-full max-w-md rounded-[28px] bg-surface p-6">
         <Text className="text-2xl font-extrabold text-ink">Modal</Text>
         <Text className="mt-3 text-[15px] leading-6 text-muted">
@@ -13,6 +24,6 @@ export default function ModalScreen() {
       </View>
 
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+    </ScrollView>
   );
 }

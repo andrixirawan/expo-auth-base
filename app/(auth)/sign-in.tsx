@@ -1,11 +1,12 @@
 import { Link, router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -20,12 +21,24 @@ const inputClassName =
 const labelClassName = 'mb-2 text-sm font-bold text-label';
 
 export default function SignInScreen() {
-  const { configError, errorMessage, signIn } = useAuth();
+  const { configError, errorMessage, refreshSession, signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const passwordInputRef = useRef<TextInput | null>(null);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    Keyboard.dismiss();
+    try {
+      await refreshSession({ silent: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   async function handleSubmit() {
     if (!email.trim() || !password) {
@@ -54,14 +67,16 @@ export default function SignInScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-canvas"
+      className="flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}>
       <ScrollView
         className="flex-1"
         contentContainerClassName="min-h-full justify-center px-5 py-8"
+        automaticallyAdjustKeyboardInsets
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
         keyboardShouldPersistTaps="handled"
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => void handleRefresh()} />}
         showsVerticalScrollIndicator={false}>
         <Pressable className="flex-1 justify-center" onPress={Keyboard.dismiss}>
           <View className="rounded-[28px] bg-surface p-6 shadow-sm shadow-ink/10">
@@ -76,10 +91,13 @@ export default function SignInScreen() {
                 <TextInput
                   autoCapitalize="none"
                   autoComplete="email"
+                  blurOnSubmit={false}
                   className={inputClassName}
                   keyboardType="email-address"
+                  onSubmitEditing={() => passwordInputRef.current?.focus()}
                   placeholder="you@example.com"
                   placeholderTextColorClassName="accent-muted-soft"
+                  returnKeyType="next"
                   value={email}
                   onChangeText={setEmail}
                 />
@@ -92,8 +110,11 @@ export default function SignInScreen() {
                     autoCapitalize="none"
                     autoComplete="password"
                     className={`${inputClassName} pr-20`}
+                    ref={passwordInputRef}
+                    onSubmitEditing={() => void handleSubmit()}
                     placeholder="Your password"
                     placeholderTextColorClassName="accent-muted-soft"
+                    returnKeyType="done"
                     secureTextEntry={!showPassword}
                     value={password}
                     onChangeText={setPassword}

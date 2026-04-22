@@ -1,11 +1,12 @@
 import { Link, router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -20,13 +21,26 @@ const inputClassName =
 const labelClassName = 'mb-2 text-sm font-bold text-label';
 
 export default function SignUpScreen() {
-  const { configError, errorMessage, signUp } = useAuth();
+  const { configError, errorMessage, refreshSession, signUp } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const emailInputRef = useRef<TextInput | null>(null);
+  const passwordInputRef = useRef<TextInput | null>(null);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    Keyboard.dismiss();
+    try {
+      await refreshSession({ silent: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   async function handleSubmit() {
     if (!name.trim() || !email.trim() || !password) {
@@ -62,14 +76,16 @@ export default function SignUpScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-canvas"
+      className="flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}>
       <ScrollView
         className="flex-1"
         contentContainerClassName="min-h-full justify-center px-5 py-6"
+        automaticallyAdjustKeyboardInsets
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
         keyboardShouldPersistTaps="handled"
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => void handleRefresh()} />}
         showsVerticalScrollIndicator={false}>
         <Pressable className="flex-1 justify-center" onPress={Keyboard.dismiss}>
           <View className="rounded-[28px] bg-surface p-6 shadow-sm shadow-ink/10">
@@ -84,9 +100,12 @@ export default function SignUpScreen() {
                 <Text className={labelClassName}>Full name</Text>
                 <TextInput
                   autoCapitalize="words"
+                  blurOnSubmit={false}
                   className={inputClassName}
+                  onSubmitEditing={() => emailInputRef.current?.focus()}
                   placeholder="Jane Doe"
                   placeholderTextColorClassName="accent-muted-soft"
+                  returnKeyType="next"
                   value={name}
                   onChangeText={setName}
                 />
@@ -97,10 +116,14 @@ export default function SignUpScreen() {
                 <TextInput
                   autoCapitalize="none"
                   autoComplete="email"
+                  blurOnSubmit={false}
                   className={inputClassName}
                   keyboardType="email-address"
+                  onSubmitEditing={() => passwordInputRef.current?.focus()}
                   placeholder="you@example.com"
                   placeholderTextColorClassName="accent-muted-soft"
+                  ref={emailInputRef}
+                  returnKeyType="next"
                   value={email}
                   onChangeText={setEmail}
                 />
@@ -113,8 +136,11 @@ export default function SignUpScreen() {
                     autoCapitalize="none"
                     autoComplete="new-password"
                     className={`${inputClassName} pr-20`}
+                    onSubmitEditing={() => void handleSubmit()}
                     placeholder="Minimum 8 characters"
                     placeholderTextColorClassName="accent-muted-soft"
+                    ref={passwordInputRef}
+                    returnKeyType="done"
                     secureTextEntry={!showPassword}
                     value={password}
                     onChangeText={setPassword}

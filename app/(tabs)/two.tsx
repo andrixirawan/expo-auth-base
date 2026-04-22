@@ -1,12 +1,26 @@
-import { ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { useAuth } from '@/hooks/use-auth';
 
 export default function TabTwoScreen() {
-  const { lastSyncAt, session, status } = useAuth();
+  const { lastSyncAt, refreshSession, session, status } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    try {
+      await refreshSession({ silent: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
-    <ScrollView className="flex-1 bg-canvas" contentContainerClassName="px-5 py-5">
+    <ScrollView
+      className="flex-1"
+      contentContainerClassName="px-5 py-5"
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => void handleRefresh()} />}>
       <View className="rounded-[28px] bg-surface p-[22px]">
         <Text className="text-[26px] font-extrabold text-ink">Session inspector</Text>
         <Text className="mt-2.5 text-[15px] leading-6 text-muted">
