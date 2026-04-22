@@ -46,6 +46,12 @@
         "projectId": "288c4e53-389e-4848-ba6d-db86a420e684"
       }
     },
-    "owner": "shendrong"
+    "owner": "shendrong",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/288c4e53-389e-4848-ba6d-db86a420e684"
+    }
   }
 }
