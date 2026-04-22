@@ -1,5 +1,5 @@
-import { Link, router } from "expo-router";
-import { useState } from "react";
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -7,32 +7,35 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { useAuth } from "@/hooks/use-auth";
-import { AuthApiError } from "@/lib/auth/api";
+import { useAuth } from '@/hooks/use-auth';
+import { AuthApiError } from '@/lib/auth/api';
+
+const inputClassName =
+  'rounded-2xl border border-border-soft bg-input px-4 py-3.5 text-base text-ink';
+const labelClassName = 'mb-2 text-sm font-bold text-label';
 
 export default function SignUpScreen() {
   const { configError, errorMessage, signUp } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit() {
     if (!name.trim() || !email.trim() || !password) {
-      setSubmitError("Nama, email, dan password wajib diisi.");
+      setSubmitError('Nama, email, dan password wajib diisi.');
       return;
     }
 
     if (password.length < 8) {
-      setSubmitError("Password minimal 8 karakter sesuai kontrak backend.");
+      setSubmitError('Password minimal 8 karakter sesuai kontrak backend.');
       return;
     }
 
@@ -45,12 +48,12 @@ export default function SignUpScreen() {
         email,
         password,
       });
-      router.replace("/(tabs)");
+      router.replace('/(tabs)');
     } catch (error) {
       setSubmitError(
         error instanceof AuthApiError
           ? error.message
-          : "Tidak bisa register sekarang. Coba lagi.",
+          : 'Tidak bisa register sekarang. Coba lagi.',
       );
     } finally {
       setIsSubmitting(false);
@@ -59,223 +62,106 @@ export default function SignUpScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboard}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
-    >
+      className="flex-1 bg-canvas"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+        className="flex-1"
+        contentContainerClassName="min-h-full justify-center px-5 py-6"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <Pressable style={styles.pressSurface} onPress={Keyboard.dismiss}>
-          <View style={styles.card}>
-          <Text style={styles.label}>Full name</Text>
-          <TextInput
-            autoCapitalize="words"
-            placeholder="Jane Doe"
-            placeholderTextColor="#8c8174"
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-          />
-
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            placeholder="you@example.com"
-            placeholderTextColor="#8c8174"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.passwordWrapper}>
-            <TextInput
-              autoCapitalize="none"
-              autoComplete="new-password"
-              placeholder="Minimum 8 characters"
-              placeholderTextColor="#8c8174"
-              secureTextEntry={!showPassword}
-              style={styles.passwordInput}
-              value={password}
-              onChangeText={setPassword}
-            />
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setShowPassword((prev) => !prev)}
-              style={({ pressed }) => [styles.passwordToggle, pressed && styles.primaryButtonPressed]}
-            >
-              <Text style={styles.passwordToggleText}>{showPassword ? "Hide" : "Show"}</Text>
-            </Pressable>
-          </View>
-
-          {(configError || submitError || errorMessage) && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>
-                {configError ?? submitError ?? errorMessage}
-              </Text>
-            </View>
-          )}
-
-          <Pressable
-            disabled={Boolean(configError) || isSubmitting}
-            onPress={handleSubmit}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              (pressed || isSubmitting || configError) &&
-                styles.primaryButtonPressed,
-            ]}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#fffdf8" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Create account</Text>
-            )}
-          </Pressable>
-
-          <Link href="/(auth)/sign-in" style={styles.secondaryLink}>
-            <Text style={styles.secondaryLinkText}>
-              Sudah punya akun? Balik ke login.
+        showsVerticalScrollIndicator={false}>
+        <Pressable className="flex-1 justify-center" onPress={Keyboard.dismiss}>
+          <View className="rounded-[28px] bg-surface p-6 shadow-sm shadow-ink/10">
+            <Text className="text-[28px] font-extrabold text-ink">Create account</Text>
+            <Text className="mt-2 text-[15px] leading-6 text-muted">
+              Bikin akun baru untuk langsung mendapatkan session native yang tersimpan aman di
+              perangkat.
             </Text>
-          </Link>
+
+            <View className="mt-6 gap-4">
+              <View>
+                <Text className={labelClassName}>Full name</Text>
+                <TextInput
+                  autoCapitalize="words"
+                  className={inputClassName}
+                  placeholder="Jane Doe"
+                  placeholderTextColorClassName="accent-muted-soft"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+
+              <View>
+                <Text className={labelClassName}>Email</Text>
+                <TextInput
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  className={inputClassName}
+                  keyboardType="email-address"
+                  placeholder="you@example.com"
+                  placeholderTextColorClassName="accent-muted-soft"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+
+              <View>
+                <Text className={labelClassName}>Password</Text>
+                <View className="relative justify-center">
+                  <TextInput
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                    className={`${inputClassName} pr-20`}
+                    placeholder="Minimum 8 characters"
+                    placeholderTextColorClassName="accent-muted-soft"
+                    secureTextEntry={!showPassword}
+                    value={password}
+                    onChangeText={setPassword}
+                  />
+                  <Pressable
+                    accessibilityRole="button"
+                    className="absolute right-3 rounded-xl bg-secondary px-3 py-1.5 active:opacity-70"
+                    onPress={() => setShowPassword((prev) => !prev)}>
+                    <Text className="text-[13px] font-bold text-brand">
+                      {showPassword ? 'Hide' : 'Show'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+
+            {(configError || submitError || errorMessage) && (
+              <View className="mt-4 rounded-2xl bg-warning-bg px-3.5 py-3">
+                <Text className="text-sm leading-5 text-warning-fg">
+                  {configError ?? submitError ?? errorMessage}
+                </Text>
+              </View>
+            )}
+
+            <Pressable
+              className="mt-5 min-h-14 items-center justify-center rounded-[18px] bg-brand active:opacity-70 disabled:opacity-60"
+              disabled={Boolean(configError) || isSubmitting}
+              onPress={handleSubmit}>
+              {isSubmitting ? (
+                <ActivityIndicator colorClassName="accent-brand-contrast" />
+              ) : (
+                <Text className="text-base font-extrabold text-brand-contrast">
+                  Create account
+                </Text>
+              )}
+            </Pressable>
+
+            <Link asChild href="/(auth)/sign-in">
+              <Pressable className="mt-5 self-center active:opacity-70">
+                <Text className="text-[15px] font-bold text-brand">
+                  Sudah punya akun? Balik ke login.
+                </Text>
+              </Pressable>
+            </Link>
           </View>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  keyboard: {
-    flex: 1,
-    backgroundColor: "#f5efe2",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    gap: 18,
-    justifyContent: "center",
-  },
-  pressSurface: {
-    flex: 1,
-  },
-  hero: {
-    borderRadius: 28,
-    backgroundColor: "#cb5f3c",
-    paddingHorizontal: 22,
-    paddingVertical: 26,
-  },
-  eyebrow: {
-    color: "#ffe7d9",
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-  },
-  title: {
-    marginTop: 10,
-    color: "#fffaf5",
-    fontSize: 30,
-    fontWeight: "800",
-    lineHeight: 34,
-  },
-  subtitle: {
-    marginTop: 12,
-    color: "#fff0e8",
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  card: {
-    borderRadius: 28,
-    backgroundColor: "#fffdf8",
-    padding: 22,
-  },
-  label: {
-    marginBottom: 8,
-    color: "#3b3127",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  input: {
-    marginBottom: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#ddcfbb",
-    backgroundColor: "#fcf7ef",
-    color: "#1c1712",
-    fontSize: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  passwordWrapper: {
-    marginBottom: 16,
-    position: "relative",
-    justifyContent: "center",
-  },
-  passwordInput: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#ddcfbb",
-    backgroundColor: "#fcf7ef",
-    color: "#1c1712",
-    fontSize: 16,
-    paddingLeft: 16,
-    paddingRight: 76,
-    paddingVertical: 14,
-  },
-  passwordToggle: {
-    position: "absolute",
-    right: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    backgroundColor: "#efe4d4",
-  },
-  passwordToggleText: {
-    color: "#1f4d3e",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  errorBox: {
-    borderRadius: 16,
-    backgroundColor: "#fff1ea",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  errorText: {
-    color: "#8a391d",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  primaryButton: {
-    marginTop: 4,
-    minHeight: 54,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 18,
-    backgroundColor: "#1f4d3e",
-  },
-  primaryButtonPressed: {
-    opacity: 0.7,
-  },
-  primaryButtonText: {
-    color: "#fffdf8",
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  secondaryLink: {
-    marginTop: 18,
-    alignSelf: "center",
-  },
-  secondaryLinkText: {
-    color: "#1f4d3e",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-});

@@ -383,14 +383,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pendingAction: 'sign-out',
     }));
 
+    const token = await authStorage.getToken();
+
     try {
-      const token = await authStorage.getToken();
       await authApi.signOut(token);
+    } catch {
+      // Local logout must still succeed even if the server-side sign-out call fails.
     } finally {
       await authStorage.clearAll();
+      syncPromiseRef.current = null;
       setState((current) => ({
         ...current,
         ...applyAnonymousState(),
+        errorMessage: null,
         lastSyncError: null,
         pendingAction: null,
       }));

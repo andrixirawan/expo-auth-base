@@ -279,13 +279,16 @@ export const authApi = {
       return;
     }
 
-    const headers = createBaseHeaders();
+    const headers = createBaseHeaders({
+      'Content-Type': 'application/json',
+    });
     headers.set('Authorization', `Bearer ${token}`);
 
     try {
       const response = await fetchWithTimeout(getAuthUrl('/sign-out'), {
         method: 'POST',
         headers,
+        body: JSON.stringify({}),
       });
 
       if (!response.ok && response.status !== 401) {

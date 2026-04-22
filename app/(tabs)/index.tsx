@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useAuth } from '@/hooks/use-auth';
 
@@ -11,153 +11,71 @@ export default function TabOneScreen() {
     : '-';
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.hero}>
-        <Text style={styles.kicker}>Authenticated</Text>
-        <Text style={styles.title}>Halo, {session?.user.name ?? 'user'}.</Text>
-        <Text style={styles.copy}>
+    <ScrollView
+      className="flex-1 bg-canvas"
+      contentContainerClassName="gap-[18px] px-5 py-5">
+      <View className="rounded-[28px] bg-brand-cool p-[22px]">
+        <Text className="text-[13px] font-bold uppercase tracking-[1.2px] text-info">
+          Authenticated
+        </Text>
+        <Text className="mt-3 text-[30px] font-extrabold text-brand-contrast">
+          Halo, {session?.user.name ?? 'user'}.
+        </Text>
+        <Text className="mt-2.5 text-[15px] leading-6 text-info-contrast">
           Session native sudah hidup. Token disimpan aman, lalu state user selalu dibaca ulang dari
           `/api/auth/get-session`.
         </Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Current session</Text>
-        <Text style={styles.rowLabel}>Email</Text>
-        <Text style={styles.rowValue}>{session?.user.email ?? '-'}</Text>
-        <Text style={styles.rowLabel}>Role</Text>
-        <Text style={styles.rowValue}>{session?.user.role ?? 'User'}</Text>
-        <Text style={styles.rowLabel}>Client type</Text>
-        <Text style={styles.rowValue}>{session?.session.clientType ?? 'native'}</Text>
-        <Text style={styles.rowLabel}>Expires at</Text>
-        <Text style={styles.rowValue}>{expiresLabel}</Text>
+      <View className="rounded-[28px] bg-surface p-[22px]">
+        <Text className="text-2xl font-extrabold text-ink">Current session</Text>
+
+        <Text className="mt-4 text-xs font-bold uppercase tracking-[1.1px] text-muted-soft">
+          Email
+        </Text>
+        <Text className="mt-1.5 text-base leading-6 text-copy">{session?.user.email ?? '-'}</Text>
+
+        <Text className="mt-4 text-xs font-bold uppercase tracking-[1.1px] text-muted-soft">
+          Role
+        </Text>
+        <Text className="mt-1.5 text-base leading-6 text-copy">{session?.user.role ?? 'User'}</Text>
+
+        <Text className="mt-4 text-xs font-bold uppercase tracking-[1.1px] text-muted-soft">
+          Client type
+        </Text>
+        <Text className="mt-1.5 text-base leading-6 text-copy">
+          {session?.session.clientType ?? 'native'}
+        </Text>
+
+        <Text className="mt-4 text-xs font-bold uppercase tracking-[1.1px] text-muted-soft">
+          Expires at
+        </Text>
+        <Text className="mt-1.5 text-base leading-6 text-copy">{expiresLabel}</Text>
 
         {lastSyncError ? (
-          <View style={styles.warningBox}>
-            <Text style={styles.warningText}>{lastSyncError}</Text>
+          <View className="mt-[18px] rounded-2xl bg-warning-bg p-3.5">
+            <Text className="text-sm leading-5 text-warning-fg">{lastSyncError}</Text>
           </View>
         ) : null}
 
-        <Pressable onPress={() => void refreshSession()} style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Refresh session</Text>
+        <Pressable
+          className="mt-[22px] min-h-[52px] items-center justify-center rounded-[18px] bg-brand active:opacity-70"
+          onPress={() => void refreshSession()}>
+          <Text className="text-base font-extrabold text-brand-contrast">Refresh session</Text>
         </Pressable>
 
-        <Pressable onPress={() => router.push('/two')} style={styles.secondaryButton}>
-          <Text style={styles.secondaryButtonText}>View raw session</Text>
+        <Pressable
+          className="mt-3 min-h-[52px] items-center justify-center rounded-[18px] bg-secondary active:opacity-70"
+          onPress={() => router.push('/two')}>
+          <Text className="text-base font-bold text-copy">View raw session</Text>
         </Pressable>
 
-        <Pressable onPress={() => void signOut()} style={styles.ghostButton}>
-          <Text style={styles.ghostButtonText}>Logout</Text>
+        <Pressable
+          className="mt-3 min-h-[52px] items-center justify-center rounded-[18px] border border-border-soft active:opacity-70"
+          onPress={() => void signOut()}>
+          <Text className="text-[15px] font-bold text-warning-fg">Logout</Text>
         </Pressable>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: '#f5efe2',
-    padding: 20,
-    gap: 18,
-  },
-  hero: {
-    borderRadius: 28,
-    backgroundColor: '#0f2d3f',
-    padding: 22,
-  },
-  kicker: {
-    color: '#91c9e7',
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
-  title: {
-    marginTop: 12,
-    color: '#f6fbff',
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  copy: {
-    marginTop: 10,
-    color: '#d2e6f2',
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  card: {
-    borderRadius: 28,
-    backgroundColor: '#fffdf8',
-    padding: 22,
-  },
-  cardTitle: {
-    color: '#1c1712',
-    fontSize: 24,
-    fontWeight: '800',
-  },
-  rowLabel: {
-    marginTop: 16,
-    color: '#8c8174',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.1,
-    textTransform: 'uppercase',
-  },
-  rowValue: {
-    marginTop: 6,
-    color: '#332a20',
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  warningBox: {
-    marginTop: 18,
-    borderRadius: 16,
-    backgroundColor: '#fff1ea',
-    padding: 14,
-  },
-  warningText: {
-    color: '#8a391d',
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  primaryButton: {
-    marginTop: 22,
-    minHeight: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-    backgroundColor: '#1f4d3e',
-  },
-  primaryButtonText: {
-    color: '#fffdf8',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  secondaryButton: {
-    marginTop: 12,
-    minHeight: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-    backgroundColor: '#efe4d4',
-  },
-  secondaryButtonText: {
-    color: '#332a20',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  ghostButton: {
-    marginTop: 12,
-    minHeight: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#ddcfbb',
-  },
-  ghostButtonText: {
-    color: '#8a391d',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-});
