@@ -1,5 +1,6 @@
+import { Button } from 'heroui-native/button';
 import { router } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { useAuth } from '@/hooks/use-auth';
 
@@ -58,23 +59,17 @@ export default function TabOneScreen() {
           </View>
         ) : null}
 
-        <Pressable
-          className="mt-[22px] min-h-[52px] items-center justify-center rounded-[18px] bg-brand active:opacity-70"
-          onPress={() => void refreshSession()}>
-          <Text className="text-base font-extrabold text-brand-contrast">Refresh session</Text>
-        </Pressable>
+        <Button className="mt-[22px]" onPress={() => void refreshSession()}>
+          Refresh session
+        </Button>
 
-        <Pressable
-          className="mt-3 min-h-[52px] items-center justify-center rounded-[18px] bg-secondary active:opacity-70"
-          onPress={() => router.push('/two')}>
-          <Text className="text-base font-bold text-copy">View raw session</Text>
-        </Pressable>
+        <Button className="mt-3" variant="secondary" onPress={() => router.push('/two')}>
+          View raw session
+        </Button>
 
-        <Pressable
-          className="mt-3 min-h-[52px] items-center justify-center rounded-[18px] border border-border-soft active:opacity-70"
-          onPress={() => void signOut()}>
-          <Text className="text-[15px] font-bold text-warning-fg">Logout</Text>
-        </Pressable>
+        <Button className="mt-3" variant="danger-soft" onPress={() => void signOut()}>
+          Logout
+        </Button>
       </View>
     </ScrollView>
   );
