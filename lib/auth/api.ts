@@ -27,6 +27,28 @@ export function getApiBaseUrl() {
   return rawValue ? rawValue.replace(/\/+$/, '') : null;
 }
 
+function toUrlOrigin(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value.trim()).origin;
+  } catch {
+    return null;
+  }
+}
+
+function getNativeOrigin() {
+  const explicitOrigin = toUrlOrigin(process.env.EXPO_PUBLIC_AUTH_ORIGIN);
+
+  if (explicitOrigin) {
+    return explicitOrigin;
+  }
+
+  return toUrlOrigin(getApiBaseUrl());
+}
+
 function getAuthUrl(path: string) {
   const baseUrl = getApiBaseUrl();
 
@@ -91,6 +113,15 @@ async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs
 function createBaseHeaders(extraHeaders?: HeadersInit) {
   const headers = new Headers(extraHeaders);
   headers.set('X-Client-Type', getClientType());
+
+  // React Native fetch may not include Origin by default.
+  if (Platform.OS !== 'web') {
+    const nativeOrigin = getNativeOrigin();
+    if (nativeOrigin) {
+      headers.set('Origin', nativeOrigin);
+    }
+  }
+
   return headers;
 }
 
@@ -108,6 +139,15 @@ export class AuthApiError extends Error {
 
 function toAuthApiError(error: unknown, fallbackMessage: string) {
   if (error instanceof AuthApiError) {
+    const normalizedMessage = error.message.toLowerCase();
+    if (normalizedMessage.includes('missing or null origin')) {
+      return new AuthApiError(
+        'Backend menolak request karena header Origin tidak ada. Tambahkan origin app ke trusted origins server, lalu set EXPO_PUBLIC_AUTH_ORIGIN di app.',
+        error.status,
+        error.code
+      );
+    }
+
     return error;
   }
 

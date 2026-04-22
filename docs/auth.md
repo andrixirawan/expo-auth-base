@@ -78,6 +78,7 @@ Catatan:
 - server expose header `set-auth-token`, jadi frontend bisa membacanya dari JavaScript
 - `OPTIONS` preflight sudah ditangani
 - browser cross-origin wajib kirim `credentials: "include"` jika memakai cookie
+- untuk React Native/Expo, set `EXPO_PUBLIC_AUTH_ORIGIN` (contoh: `https://app.example.com`) agar client bisa kirim header `Origin` eksplisit saat login/signup
 
 ## 4. Header `X-Client-Type`
 
